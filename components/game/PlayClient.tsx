@@ -81,6 +81,7 @@ export function PlayClient() {
   useEffect(() => {
     if (mode === "multi" && mp.state === "playing" && !started) {
       savePlayerName(lobbyName.trim());
+      setPlayerName(lobbyName.trim());
       saveCharacterId(characterId);
       setStarted(true);
       setHud(initialHud("multi"));
@@ -221,7 +222,7 @@ export function PlayClient() {
       <div className="mb-4 flex items-center justify-between gap-4 max-md:hidden">
         <div>
           <p className="text-xs font-black uppercase tracking-[.2em] text-secondary">{mode.replace("-", " ")}</p>
-          <h1 className="text-lg font-black text-white">{playerName} · {character.name}</h1>
+          <h1 className="text-lg font-black text-white">{mode === "multi" ? lobbyName : playerName} · {character.name}</h1>
         </div>
         <button type="button" className="ghost-button" onClick={quitToSetup}>Keluar</button>
       </div>
