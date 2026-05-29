@@ -26,7 +26,7 @@ export class MultiplayerScene extends TrapGameScene {
       if (sync.id === this.playerId) continue;
       let other = this.otherPlayers.get(sync.id);
       if (!other) {
-        const sprite = this.physics.add.sprite(sync.x, sync.y, "player-idle");
+        const sprite = this.physics.add.sprite(sync.x, sync.y, "player");
         const label = this.add.text(sync.x, sync.y - 40, sync.name.slice(0, 8), {
           fontSize: "12px",
           color: "#ffffff",
@@ -62,7 +62,6 @@ export class MultiplayerScene extends TrapGameScene {
   }
 
   override update(): void {
-    if (!this.synced) return;
     super.update();
   }
 }
