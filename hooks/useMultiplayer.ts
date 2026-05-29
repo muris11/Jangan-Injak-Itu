@@ -58,6 +58,24 @@ export function useMultiplayer(roomCode?: string) {
             ready: pl.ready,
           })),
         );
+        setSyncs(
+          p.map((pl) => ({
+            id: pl.id,
+            name: pl.name,
+            characterId: pl.characterId,
+            colorIndex: pl.colorIndex,
+            x: pl.x,
+            y: pl.y,
+            facingLeft: pl.facingLeft,
+            isGrounded: pl.isGrounded,
+            alive: pl.alive,
+            finished: pl.finished,
+            currentLevel: pl.currentLevel,
+            deaths: pl.deaths,
+            time: pl.time,
+            finishOrder: pl.finishOrder,
+          })),
+        );
       },
       onSync: (s) => {
         setSyncs(s);

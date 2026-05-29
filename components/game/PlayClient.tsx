@@ -217,7 +217,7 @@ export function PlayClient() {
   }
 
   return (
-    <main className="container-game pb-12 pt-5 md:pt-8">
+    <main className={`container-game pb-12 pt-5 md:pt-8${started ? " is-playing" : ""}`}>
       <div className="mb-4 flex items-center justify-between gap-4 max-md:hidden">
         <div>
           <p className="text-xs font-black uppercase tracking-[.2em] text-secondary">{mode.replace("-", " ")}</p>
@@ -225,11 +225,13 @@ export function PlayClient() {
         </div>
         <button type="button" className="ghost-button" onClick={quitToSetup}>Keluar</button>
       </div>
-      <GameHud
-        hud={hud}
-        onPause={() => dispatchControl({ action: "pause" })}
-        onRestart={() => dispatchControl({ action: "restart" })}
-      />
+      <div className="game-hud-wrapper">
+        <GameHud
+          hud={hud}
+          onPause={() => dispatchControl({ action: "pause" })}
+          onRestart={() => dispatchControl({ action: "restart" })}
+        />
+      </div>
       <div className="game-frame" data-reduced-motion={settings.reducedMotion}>
         <button type="button" className="game-frame-close md:hidden" onClick={quitToSetup} aria-label="Keluar game">✕</button>
         <GameCanvas

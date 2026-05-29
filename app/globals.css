@@ -363,7 +363,71 @@ button:disabled {
 @media (max-width: 767px) {
   .game-frame {
     aspect-ratio: unset;
-    min-height: 40svh;
+    min-height: calc(100svh - 80px);
+  }
+
+  .container-game.is-playing {
+    width: 100%;
+    padding: 0;
+    position: relative;
+  }
+
+  .container-game.is-playing .game-hud-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 15;
+  }
+
+  .container-game.is-playing .game-hud-wrapper .hud {
+    gap: 4px;
+    padding: 6px 8px;
+    justify-content: flex-start;
+  }
+
+  .container-game.is-playing .game-hud-wrapper .hud-item {
+    min-width: 52px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(18,20,43,.7);
+  }
+
+  .container-game.is-playing .game-hud-wrapper .hud-item strong {
+    font-size: 12px;
+  }
+
+  .container-game.is-playing .game-hud-wrapper .hud-item span {
+    font-size: 9px;
+  }
+
+  .container-game.is-playing .game-hud-wrapper > .flex-col {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+    gap: 8px;
+  }
+
+  .container-game.is-playing .game-hud-wrapper > .flex-col > .flex {
+    margin-left: auto;
+    gap: 4px;
+  }
+
+  .container-game.is-playing .game-hud-wrapper .ghost-button,
+  .container-game.is-playing .game-hud-wrapper .secondary-button {
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+
+  .container-game.is-playing .game-hud-wrapper .secondary-button {
+    min-height: 32px !important;
+    padding: 0 8px !important;
+  }
+
+  .game-frame-close {
+    z-index: 20;
   }
 }
 
