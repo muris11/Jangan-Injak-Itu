@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/partykit/partykit/main/packages/partykit/src/schema.json",
+  "name": "jangan-injak-itu-party",
+  "main": "party/room.ts",
+  "compatibilityDate": "2026-05-29"
+}

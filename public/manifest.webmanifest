@@ -1,0 +1,10 @@
+{
+  "name": "Jangan Injak Itu!",
+  "short_name": "JIT!",
+  "description": "Platformer jebakan absurd tanpa login.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090A1A",
+  "theme_color": "#090A1A",
+  "icons": [{"src": "/icon.svg", "sizes": "any", "type": "image/svg+xml"}]
+}
