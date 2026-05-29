@@ -77,7 +77,12 @@ export function useMultiplayer(roomCode?: string) {
 
     socketRef.current = socket;
 
-    send(socket, { type: "join", name, characterId, colorIndex });
+    const doSend = () => send(socket, { type: "join", name, characterId, colorIndex });
+    if (socket.readyState === WebSocket.OPEN) {
+      doSend();
+    } else {
+      socket.addEventListener("open", doSend, { once: true });
+    }
   }, [room]);
 
   const sendReady = useCallback(() => {

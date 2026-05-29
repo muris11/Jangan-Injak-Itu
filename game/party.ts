@@ -36,6 +36,7 @@ export function createPartyClient(
     host,
     room,
     id: clientId,
+    party: "jangan-injak-itu-party",
   });
 
   socket.addEventListener("message", (event) => {
