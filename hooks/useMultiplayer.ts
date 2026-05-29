@@ -24,6 +24,7 @@ function generateRoomCode(): string {
 
 export function useMultiplayer(roomCode?: string) {
   const [room, setRoom] = useState<string | null>(roomCode ?? null);
+  const [hostId, setHostId] = useState<string | null>(null);
   const [state, setState] = useState<MultiplayerRoomState["status"]>("waiting");
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [syncs, setSyncs] = useState<PlayerSync[]>([]);
@@ -44,14 +45,16 @@ export function useMultiplayer(roomCode?: string) {
     playerColorRef.current = colorIndex;
 
     const socket = createPartyClient(PARTYKIT_HOST, code, {
-      onPlayers: (p) => {
+      onPlayers: (p, host) => {
+        setHostId(host);
+        playerIdRef.current = p.find((pl) => pl.name === playerNameRef.current)?.id ?? null;
         setPlayers(
           p.map((pl) => ({
             id: pl.id,
             name: pl.name,
             characterId: pl.characterId,
             colorIndex: pl.colorIndex,
-            ready: false,
+            ready: pl.ready,
           })),
         );
       },
@@ -119,6 +122,7 @@ export function useMultiplayer(roomCode?: string) {
 
   return {
     room,
+    hostId,
     playerId: playerIdRef.current,
     state,
     players,

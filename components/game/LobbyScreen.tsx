@@ -17,6 +17,8 @@ type Props = {
   error: string | null;
   room: string | null;
   players: { id: string; name: string; colorIndex: number; ready: boolean }[];
+  playerId: string | null;
+  hostId: string | null;
   onName: (name: string) => void;
   onCharacter: (id: CharacterId) => void;
   onCreateRoom: () => void;
@@ -26,11 +28,14 @@ type Props = {
   onDisconnect: () => void;
 };
 
-export default function LobbyScreen({ name, character, error, room, players, onName, onCharacter, onCreateRoom, onJoinRoom, onReady, onStartGame, onDisconnect }: Props) {
+export default function LobbyScreen({ name, character, error, room, players, playerId, hostId, onName, onCharacter, onCreateRoom, onJoinRoom, onReady, onStartGame, onDisconnect }: Props) {
   const [joined, setJoined] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [joinCode, setJoinCode] = useState("");
+
+  const isHost = playerId !== null && playerId === hostId;
+  const allReady = players.length >= 2 && players.every((p) => p.ready);
 
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -164,7 +169,12 @@ export default function LobbyScreen({ name, character, error, room, players, onN
               {p.name[0]}
             </div>
             <span className="text-white text-sm flex-1 truncate">{p.name}</span>
-            {p.ready && <span className="text-green-400 text-xs">Siap</span>}
+            {p.id === hostId && <span className="text-yellow-400 text-xs">👑</span>}
+            {p.ready ? (
+              <span className="text-green-400 text-xs">Siap</span>
+            ) : (
+              <span className="text-gray-500 text-xs">-</span>
+            )}
           </div>
         ))}
       </div>
@@ -172,16 +182,31 @@ export default function LobbyScreen({ name, character, error, room, players, onN
       <div className="flex gap-3">
         <button
           onClick={onReady}
-          className="px-5 py-2 rounded bg-green-600 text-white font-bold hover:bg-green-500 transition"
+          className={`px-5 py-2 rounded font-bold transition ${
+            players.find((p) => p.id === playerId)?.ready
+              ? "bg-gray-600 text-gray-300"
+              : "bg-green-600 text-white hover:bg-green-500"
+          }`}
         >
-          Siap
+          {players.find((p) => p.id === playerId)?.ready ? "Siap ✓" : "Siap"}
         </button>
-        <button
-          onClick={onStartGame}
-          className="px-5 py-2 rounded bg-orange-500 text-white font-bold hover:bg-orange-400 transition"
-        >
-          Mulai
-        </button>
+        {isHost ? (
+          <button
+            onClick={allReady ? onStartGame : undefined}
+            disabled={!allReady}
+            className={`px-5 py-2 rounded font-bold transition ${
+              allReady
+                ? "bg-orange-500 text-white hover:bg-orange-400"
+                : "bg-gray-700 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            {players.length < 2 ? "Tunggu pemain lain..." : allReady ? "Mulai" : "Belum semua siap"}
+          </button>
+        ) : (
+          <span className="px-5 py-2 rounded bg-gray-800 text-gray-400 text-sm flex items-center">
+            Menunggu host mulai...
+          </span>
+        )}
         <button
           onClick={onDisconnect}
           className="px-5 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 transition"

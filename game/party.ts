@@ -9,15 +9,17 @@ export type ClientMessage =
   | { type: "finish"; time: number }
   | { type: "leave" };
 
+export type LobbyPlayerData = PlayerSync & { ready: boolean };
+
 export type ServerMessage =
-  | { type: "players"; players: PlayerSync[] }
+  | { type: "players"; players: LobbyPlayerData[]; hostId: string }
   | { type: "sync"; syncs: PlayerSync[] }
   | { type: "start"; startTime: number }
   | { type: "finished"; rankings: MultiplayerRanking[] }
   | { type: "error"; message: string };
 
 export type MessageHandler = {
-  onPlayers: (players: PlayerSync[]) => void;
+  onPlayers: (players: LobbyPlayerData[], hostId: string) => void;
   onSync: (syncs: PlayerSync[]) => void;
   onStart: (startTime: number) => void;
   onFinished: (rankings: MultiplayerRanking[]) => void;
@@ -40,7 +42,7 @@ export function createPartyClient(
       const msg: ServerMessage = JSON.parse(event.data as string);
       switch (msg.type) {
         case "players":
-          handlers.onPlayers(msg.players);
+          handlers.onPlayers(msg.players, msg.hostId);
           break;
         case "sync":
           handlers.onSync(msg.syncs);

@@ -8,6 +8,7 @@ type PlayerState = {
   characterId: string;
   colorIndex: number;
   x: number; y: number;
+  facingLeft: boolean;
   isGrounded: boolean;
   alive: boolean;
   finished: boolean;
@@ -20,15 +21,15 @@ type PlayerState = {
 
 type InMessage =
   | { type: "join"; name: string; characterId: string }
-  | { type: "sync"; x: number; y: number; isGrounded: boolean; alive: boolean; finished: boolean; currentLevel: number; deaths: number; time: number }
+  | { type: "sync"; facingLeft: boolean; x: number; y: number; isGrounded: boolean; alive: boolean; finished: boolean; currentLevel: number; deaths: number; time: number }
   | { type: "ready" }
   | { type: "start" }
   | { type: "finish"; time: number };
 
 type OutMessage =
-  | { type: "room_state"; players: PlayerState[]; hostId: string; status: string }
-  | { type: "game_start"; startedAt: number }
-  | { type: "game_end"; rankings: PlayerState[] }
+  | { type: "players"; players: PlayerState[]; hostId: string }
+  | { type: "start"; startTime: number }
+  | { type: "finished"; rankings: PlayerState[] }
   | { type: "error"; message: string };
 
 function colorIndex(used: Set<number>): number {
@@ -65,7 +66,7 @@ export default class Room implements PartyServer {
         this.players.set(sender.id, {
           id: sender.id, name: msg.name, characterId: msg.characterId,
           colorIndex: colorIndex(used),
-          x: 130, y: 600, isGrounded: true, alive: true, finished: false,
+          x: 130, y: 600, facingLeft: false, isGrounded: true, alive: true, finished: false,
           currentLevel: 0, deaths: 0, time: 0, finishOrder: null, ready: false,
         });
         if (!this.hostId) this.hostId = sender.id;
@@ -75,7 +76,7 @@ export default class Room implements PartyServer {
       case "sync": {
         const p = this.players.get(sender.id);
         if (!p) return;
-        Object.assign(p, { x: msg.x, y: msg.y, isGrounded: msg.isGrounded, alive: msg.alive, finished: msg.finished, currentLevel: msg.currentLevel, deaths: msg.deaths, time: msg.time });
+        Object.assign(p, { facingLeft: msg.facingLeft, x: msg.x, y: msg.y, isGrounded: msg.isGrounded, alive: msg.alive, finished: msg.finished, currentLevel: msg.currentLevel, deaths: msg.deaths, time: msg.time });
         break;
       }
       case "ready": {
@@ -89,7 +90,7 @@ export default class Room implements PartyServer {
         if (this.players.size < 2) { sender.send(JSON.stringify({ type: "error", message: "Minimal 2 pemain!" })); return; }
         this.status = "playing";
         this.finishOrder = 0;
-        this.broadcast({ type: "game_start", startedAt: Date.now() });
+        this.broadcast({ type: "start", startTime: Date.now() });
         this.syncTimer = setInterval(() => this.broadcastRoom(), 50);
         break;
       }
@@ -127,14 +128,14 @@ export default class Room implements PartyServer {
   }
 
   private broadcastRoom(): void {
-    this.broadcast({ type: "room_state", players: [...this.players.values()], hostId: this.hostId ?? "", status: this.status });
+    this.broadcast({ type: "players", players: [...this.players.values()], hostId: this.hostId ?? "" });
   }
 
   private endGame(): void {
     this.status = "finished";
     this.stopSync();
     const rankings = [...this.players.values()].sort((a, b) => (a.finishOrder ?? 99) - (b.finishOrder ?? 99));
-    this.broadcast({ type: "game_end", rankings });
+    this.broadcast({ type: "finished", rankings });
   }
 
   private stopSync(): void {

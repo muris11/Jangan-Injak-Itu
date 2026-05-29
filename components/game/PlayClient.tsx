@@ -163,10 +163,12 @@ export function PlayClient() {
           error={mp.error}
           room={mp.room}
           players={mp.players}
+          playerId={mp.playerId}
+          hostId={mp.hostId}
           onName={(value) => setLobbyName(value)}
           onCharacter={setCharacterId}
-           onCreateRoom={handleMultiCreateRoom}
-           onJoinRoom={handleMultiJoinRoom}
+          onCreateRoom={handleMultiCreateRoom}
+          onJoinRoom={handleMultiJoinRoom}
           onReady={mp.sendReady}
           onStartGame={handleMultiStart}
           onDisconnect={mp.disconnect}
