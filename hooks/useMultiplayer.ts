@@ -24,6 +24,7 @@ function generateRoomCode(): string {
 
 export function useMultiplayer(roomCode?: string) {
   const [room, setRoom] = useState<string | null>(roomCode ?? null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const [hostId, setHostId] = useState<string | null>(null);
   const [state, setState] = useState<MultiplayerRoomState["status"]>("waiting");
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
@@ -32,7 +33,7 @@ export function useMultiplayer(roomCode?: string) {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const socketRef = useRef<PartySocket | null>(null);
-  const playerIdRef = useRef<string | null>(null);
+  const clientIdRef = useRef<string>(crypto.randomUUID());
   const playerNameRef = useRef<string>("");
   const playerCharRef = useRef<CharacterId>("bro");
   const playerColorRef = useRef<number>(0);
@@ -40,14 +41,14 @@ export function useMultiplayer(roomCode?: string) {
   const connect = useCallback((name: string, characterId: CharacterId, colorIndex: number, joinRoomCode?: string) => {
     const code = joinRoomCode ?? room ?? generateRoomCode();
     setRoom(code);
+    setPlayerId(clientIdRef.current);
     playerNameRef.current = name;
     playerCharRef.current = characterId;
     playerColorRef.current = colorIndex;
 
-    const socket = createPartyClient(PARTYKIT_HOST, code, {
+    const socket = createPartyClient(PARTYKIT_HOST, code, clientIdRef.current, {
       onPlayers: (p, host) => {
         setHostId(host);
-        playerIdRef.current = p.find((pl) => pl.name === playerNameRef.current)?.id ?? null;
         setPlayers(
           p.map((pl) => ({
             id: pl.id,
@@ -122,8 +123,8 @@ export function useMultiplayer(roomCode?: string) {
 
   return {
     room,
+    playerId,
     hostId,
-    playerId: playerIdRef.current,
     state,
     players,
     syncs,

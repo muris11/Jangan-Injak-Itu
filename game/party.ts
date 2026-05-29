@@ -29,12 +29,13 @@ export type MessageHandler = {
 export function createPartyClient(
   host: string,
   room: string,
+  clientId: string,
   handlers: MessageHandler,
 ): PartySocket {
   const socket = new PartySocket({
     host,
     room,
-    id: crypto.randomUUID(),
+    id: clientId,
   });
 
   socket.addEventListener("message", (event) => {
