@@ -19,19 +19,28 @@ type Props = {
   players: { id: string; name: string; colorIndex: number; ready: boolean }[];
   onName: (name: string) => void;
   onCharacter: (id: CharacterId) => void;
-  onConnect: () => void;
+  onCreateRoom: () => void;
+  onJoinRoom: (roomCode: string) => void;
   onReady: () => void;
   onStartGame: () => void;
   onDisconnect: () => void;
 };
 
-export default function LobbyScreen({ name, character, error, room, players, onName, onCharacter, onConnect, onReady, onStartGame, onDisconnect }: Props) {
+export default function LobbyScreen({ name, character, error, room, players, onName, onCharacter, onCreateRoom, onJoinRoom, onReady, onStartGame, onDisconnect }: Props) {
   const [joined, setJoined] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showJoin, setShowJoin] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
 
-  const handleJoin = () => {
+  const handleCreate = () => {
     if (!name.trim()) return;
-    onConnect();
+    onCreateRoom();
+    setJoined(true);
+  };
+
+  const handleJoinSubmit = () => {
+    if (!name.trim() || !joinCode.trim()) return;
+    onJoinRoom(joinCode.trim().toUpperCase());
     setJoined(true);
   };
 
@@ -50,7 +59,7 @@ export default function LobbyScreen({ name, character, error, room, players, onN
       <div className="flex flex-col items-center gap-4 p-6">
         <h2 className="text-2xl font-bold text-white">Multiplayer</h2>
         <p className="text-gray-400 text-sm text-center max-w-xs">
-          Buat atau gabung room untuk balapan dengan pemain lain!
+          Buat room baru atau masukkan kode room temanmu!
         </p>
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <input
@@ -75,12 +84,49 @@ export default function LobbyScreen({ name, character, error, room, players, onN
             </button>
           ))}
         </div>
-        <button
-          onClick={handleJoin}
-          className="px-6 py-2 rounded bg-orange-500 text-white font-bold hover:bg-orange-400 transition"
-        >
-          Buat / Gabung Room
-        </button>
+
+        {!showJoin ? (
+          <div className="flex gap-3">
+            <button
+              onClick={handleCreate}
+              className="px-6 py-2 rounded bg-orange-500 text-white font-bold hover:bg-orange-400 transition"
+            >
+              Buat Room
+            </button>
+            <button
+              onClick={() => setShowJoin(true)}
+              className="px-6 py-2 rounded bg-gray-700 text-white font-bold hover:bg-gray-600 transition"
+            >
+              Masuk Room
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-gray-400 text-xs">Masukkan kode room temanmu</p>
+            <input
+              className="w-48 px-3 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:border-orange-400 outline-none text-center font-mono tracking-widest uppercase"
+              placeholder="ABC12"
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value)}
+              maxLength={5}
+              onKeyDown={(e) => { if (e.key === "Enter") handleJoinSubmit(); }}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleJoinSubmit}
+                className="px-5 py-2 rounded bg-orange-500 text-white font-bold hover:bg-orange-400 transition"
+              >
+                Gabung
+              </button>
+              <button
+                onClick={() => setShowJoin(false)}
+                className="px-5 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 transition"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

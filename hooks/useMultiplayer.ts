@@ -36,8 +36,8 @@ export function useMultiplayer(roomCode?: string) {
   const playerCharRef = useRef<CharacterId>("bro");
   const playerColorRef = useRef<number>(0);
 
-  const connect = useCallback((name: string, characterId: CharacterId, colorIndex: number) => {
-    const code = room ?? generateRoomCode();
+  const connect = useCallback((name: string, characterId: CharacterId, colorIndex: number, joinRoomCode?: string) => {
+    const code = joinRoomCode ?? room ?? generateRoomCode();
     setRoom(code);
     playerNameRef.current = name;
     playerCharRef.current = characterId;

@@ -140,9 +140,14 @@ export function PlayClient() {
     setResult(null);
   }
 
-  function handleMultiConnect() {
+  function handleMultiCreateRoom() {
     const idx = characters.findIndex((c) => c.id === characterId);
     mp.connect(lobbyName.trim(), characterId, idx);
+  }
+
+  function handleMultiJoinRoom(roomCode: string) {
+    const idx = characters.findIndex((c) => c.id === characterId);
+    mp.connect(lobbyName.trim(), characterId, idx, roomCode);
   }
 
   function handleMultiStart() {
@@ -160,7 +165,8 @@ export function PlayClient() {
           players={mp.players}
           onName={(value) => setLobbyName(value)}
           onCharacter={setCharacterId}
-          onConnect={handleMultiConnect}
+           onCreateRoom={handleMultiCreateRoom}
+           onJoinRoom={handleMultiJoinRoom}
           onReady={mp.sendReady}
           onStartGame={handleMultiStart}
           onDisconnect={mp.disconnect}
