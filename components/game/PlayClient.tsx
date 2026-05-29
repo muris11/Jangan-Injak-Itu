@@ -245,6 +245,7 @@ export function PlayClient() {
           onMessage={handleMessage}
           playerId={mode === "multi" ? (mp.playerId ?? undefined) : undefined}
           syncs={mode === "multi" ? mp.syncs : undefined}
+          sendSync={mode === "multi" ? mp.sendSync : undefined}
         />
         {mode === "multi" ? (
           <MultiplayerHud

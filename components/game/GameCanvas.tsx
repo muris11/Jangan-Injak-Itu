@@ -15,9 +15,10 @@ type Props = {
   onMessage: (message: string) => void;
   playerId?: string;
   syncs?: PlayerSync[];
+  sendSync?: (sync: Partial<PlayerSync>) => void;
 };
 
-export function GameCanvas({ playerName, character, mode, settings, runId, onHud, onFinish, onMessage, playerId, syncs }: Props) {
+export function GameCanvas({ playerName, character, mode, settings, runId, onHud, onFinish, onMessage, playerId, syncs, sendSync }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
@@ -37,6 +38,7 @@ export function GameCanvas({ playerName, character, mode, settings, runId, onHud
           settings,
           callbacks: { onHud, onFinish, onMessage },
           playerId: playerId ?? "",
+          sendSync: sendSync ?? (() => {}),
         });
       } else {
         const { createArcadeGame } = await import("@/game/create-game");
@@ -51,13 +53,13 @@ export function GameCanvas({ playerName, character, mode, settings, runId, onHud
       }
     }
     void boot();
-
-    return () => {
-      alive = false;
-      gameRef.current?.destroy(true);
-      gameRef.current = null;
-    };
-  }, [playerName, character, mode, settings, runId, onHud, onFinish, onMessage, playerId]);
+ 
+     return () => {
+       alive = false;
+       gameRef.current?.destroy(true);
+       gameRef.current = null;
+     };
+   }, [playerName, character, mode, settings, runId, onHud, onFinish, onMessage, playerId, sendSync]);
 
   useEffect(() => {
     if (mode !== "multi" || !gameRef.current || !syncs) return;

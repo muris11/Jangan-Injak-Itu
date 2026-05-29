@@ -570,10 +570,11 @@ export function createArcadeGame(options: ArcadeGameOptions): Phaser.Game {
   });
 }
 
-export async function createMultiplayerGame(options: ArcadeGameOptions & { playerId: string }): Promise<Phaser.Game> {
+export async function createMultiplayerGame(options: ArcadeGameOptions & { playerId: string; sendSync: (sync: any) => void }): Promise<Phaser.Game> {
   const { MultiplayerScene } = await import("@/game/multiplayer-scene");
   const scene = new MultiplayerScene(options);
   scene.setPlayerId(options.playerId);
+  scene.setSendSync(options.sendSync);
   return new Phaser.Game({
     type: Phaser.AUTO,
     parent: options.parent,

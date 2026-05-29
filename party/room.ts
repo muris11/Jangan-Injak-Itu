@@ -21,7 +21,7 @@ type PlayerState = {
 
 type InMessage =
   | { type: "join"; name: string; characterId: string }
-  | { type: "sync"; facingLeft: boolean; x: number; y: number; isGrounded: boolean; alive: boolean; finished: boolean; currentLevel: number; deaths: number; time: number }
+  | { type: "sync"; sync: Partial<PlayerState> }
   | { type: "ready" }
   | { type: "start" }
   | { type: "finish"; time: number };
@@ -75,8 +75,8 @@ export default class Room implements PartyServer {
       }
       case "sync": {
         const p = this.players.get(sender.id);
-        if (!p) return;
-        Object.assign(p, { facingLeft: msg.facingLeft, x: msg.x, y: msg.y, isGrounded: msg.isGrounded, alive: msg.alive, finished: msg.finished, currentLevel: msg.currentLevel, deaths: msg.deaths, time: msg.time });
+        if (!p || !msg.sync) return;
+        Object.assign(p, msg.sync);
         break;
       }
       case "ready": {

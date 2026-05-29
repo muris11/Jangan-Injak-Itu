@@ -21,6 +21,32 @@ export class MultiplayerScene extends TrapGameScene {
     this.playerId = id;
   }
 
+  private sendSyncFn?: (sync: any) => void;
+  private lastSendTime = 0;
+
+  setSendSync(fn: (sync: any) => void) {
+    this.sendSyncFn = fn;
+  }
+
+  sendLocalSync() {
+    if (!this.player || !this.sendSyncFn) return;
+    const grounded = Boolean(
+      (this.player.body as Phaser.Physics.Arcade.Body).blocked.down ||
+      (this.player.body as Phaser.Physics.Arcade.Body).touching.down
+    );
+    this.sendSyncFn({
+      facingLeft: this.player.flipX,
+      x: Math.round(this.player.x),
+      y: Math.round(this.player.y),
+      isGrounded: grounded,
+      alive: !this.player.getData("dying"),
+      finished: Boolean(this.player.getData("finishing")),
+      currentLevel: this.runtime.currentLevel,
+      deaths: this.runtime.deaths,
+      time: this.elapsedMs(),
+    });
+  }
+
   onPlayersSync(syncs: PlayerSync[]) {
     for (const sync of syncs) {
       if (sync.id === this.playerId) continue;
@@ -63,5 +89,10 @@ export class MultiplayerScene extends TrapGameScene {
 
   override update(): void {
     super.update();
+    const now = this.time.now;
+    if (now - this.lastSendTime > 50) {
+      this.lastSendTime = now;
+      this.sendLocalSync();
+    }
   }
 }
