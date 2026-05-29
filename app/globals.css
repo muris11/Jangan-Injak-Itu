@@ -337,6 +337,36 @@ button:disabled {
   height: 100% !important;
 }
 
+.game-frame-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 15;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  background: rgba(0,0,0,.55);
+  font-size: 16px;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.game-frame-close:hover {
+  background: rgba(255,59,92,.7);
+}
+
+@media (max-width: 767px) {
+  .game-frame {
+    aspect-ratio: unset;
+    min-height: 40svh;
+  }
+}
+
 .hud {
   display: flex;
   gap: 8px;
@@ -629,18 +659,33 @@ button:disabled {
 
 @media (max-height: 640px) and (orientation: landscape) {
   .game-frame {
-    max-height: calc(100svh - 138px);
-    width: min(calc((100svh - 138px) * 1.777), 100%);
+    max-height: calc(100svh - 80px);
+    width: min(calc((100svh - 80px) * 1.777), 100%);
   }
 
   .mobile-control-button {
-    height: 54px;
-    min-width: 54px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 14px;
   }
 
   .mobile-control-button.jump {
-    height: 62px;
-    min-width: 70px;
+    height: 56px;
+    min-width: 64px;
+    border-radius: 16px;
+  }
+
+  .hud-item {
+    padding: 4px 10px;
+    min-width: 60px;
+  }
+
+  .hud-item strong {
+    font-size: 13px;
+  }
+
+  .hud-item span {
+    font-size: 10px;
   }
 }
 

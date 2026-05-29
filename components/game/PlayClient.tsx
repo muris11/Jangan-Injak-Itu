@@ -218,7 +218,7 @@ export function PlayClient() {
 
   return (
     <main className="container-game pb-12 pt-5 md:pt-8">
-      <div className="mb-4 flex items-center justify-between gap-4">
+      <div className="mb-4 flex items-center justify-between gap-4 max-md:hidden">
         <div>
           <p className="text-xs font-black uppercase tracking-[.2em] text-secondary">{mode.replace("-", " ")}</p>
           <h1 className="text-lg font-black text-white">{playerName} · {character.name}</h1>
@@ -231,6 +231,7 @@ export function PlayClient() {
         onRestart={() => dispatchControl({ action: "restart" })}
       />
       <div className="game-frame" data-reduced-motion={settings.reducedMotion}>
+        <button type="button" className="game-frame-close md:hidden" onClick={quitToSetup} aria-label="Keluar game">✕</button>
         <GameCanvas
           playerName={mode === "multi" ? lobbyName.trim() : playerName.trim()}
           character={character}
@@ -263,7 +264,7 @@ export function PlayClient() {
       <div className="mt-5 hidden justify-center gap-6 text-sm font-bold text-muted lg:flex">
         <span>A / ← &nbsp; Kiri</span><span>D / → &nbsp; Kanan</span><span>Space &nbsp; Lompat</span><span>P &nbsp; Pause</span><span>R &nbsp; Restart</span>
       </div>
-      {mode !== "multi" && !result ? <MobileControls opacity={settings.mobileControlsOpacity} /> : null}
+      {!result ? <MobileControls opacity={settings.mobileControlsOpacity} /> : null}
       {result && mode !== "multi" ? (
         <ResultModal
           result={result}
