@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import PartySocket from "partysocket";
 import { createPartyClient, send } from "@/game/party";
 import type { MultiplayerRoomState, PlayerSync, MultiplayerRanking, CharacterId } from "@/types/game";
 
@@ -32,13 +31,14 @@ export function useMultiplayer(roomCode?: string) {
   const [rankings, setRankings] = useState<MultiplayerRanking[] | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const socketRef = useRef<PartySocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const clientIdRef = useRef<string>(crypto.randomUUID());
   const playerNameRef = useRef<string>("");
   const playerCharRef = useRef<CharacterId>("bro");
   const playerColorRef = useRef<number>(0);
 
   const connect = useCallback((name: string, characterId: CharacterId, colorIndex: number, joinRoomCode?: string) => {
+    if (socketRef.current) return;
     const code = joinRoomCode ?? room ?? generateRoomCode();
     setRoom(code);
     setPlayerId(clientIdRef.current);
@@ -107,6 +107,8 @@ export function useMultiplayer(roomCode?: string) {
       socketRef.current.close();
       socketRef.current = null;
     }
+    setRoom(null);
+    setHostId(null);
     setState("waiting");
     setPlayers([]);
     setSyncs([]);

@@ -1,4 +1,3 @@
-import PartySocket from "partysocket";
 import type { CharacterId, PlayerSync, MultiplayerRanking } from "@/types/game";
 
 export type ClientMessage =
@@ -26,18 +25,24 @@ export type MessageHandler = {
   onError: (message: string) => void;
 };
 
+function normalizeHost(host: string): string {
+  return host
+    .replace(/^(https?|wss?):\/\//, "")
+    .replace(/\/$/, "");
+}
+
 export function createPartyClient(
   host: string,
   room: string,
   clientId: string,
   handlers: MessageHandler,
-): PartySocket {
-  const socket = new PartySocket({
-    host,
-    room,
-    id: clientId,
-    party: "jangan-injak-itu-party",
-  });
+): WebSocket {
+  const h = normalizeHost(host);
+  const isLocal = h.startsWith("localhost:") || h.startsWith("127.0.0.1:");
+  const protocol = isLocal ? "ws" : "wss";
+  const url = `${protocol}://${h}/party/${room}?_pk=${encodeURIComponent(clientId)}`;
+
+  const socket = new WebSocket(url);
 
   socket.addEventListener("message", (event) => {
     try {
@@ -67,6 +72,8 @@ export function createPartyClient(
   return socket;
 }
 
-export function send(socket: PartySocket, msg: ClientMessage) {
-  socket.send(JSON.stringify(msg));
+export function send(socket: WebSocket, msg: ClientMessage) {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(msg));
+  }
 }

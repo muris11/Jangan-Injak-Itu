@@ -11,6 +11,7 @@ import { ResultModal } from "@/components/game/ResultModal";
 import { Toast } from "@/components/ui/Toast";
 import LobbyScreen from "@/components/game/LobbyScreen";
 import MultiplayerHud from "@/components/game/MultiplayerHud";
+import { LandscapeOverlay } from "@/components/game/LandscapeOverlay";
 import { characters, getCharacter } from "@/game/data/characters";
 import { dispatchControl } from "@/game/controls";
 import { useMultiplayer } from "@/hooks/useMultiplayer";
@@ -73,9 +74,19 @@ export function PlayClient() {
 
   useEffect(() => {
     if (mode === "multi" && mp.room && mp.room !== params.get("room")) {
-      router.replace(`/play?mode=multi&room=${mp.room}`, { scroll: false });
+      window.history.replaceState(null, "", `/play?mode=multi&room=${mp.room}`);
     }
-  }, [mode, mp.room, params, router]);
+  }, [mode, mp.room, params]);
+
+  useEffect(() => {
+    if (mode === "multi" && mp.state === "playing" && !started) {
+      savePlayerName(lobbyName.trim());
+      saveCharacterId(characterId);
+      setStarted(true);
+      setHud(initialHud("multi"));
+      autoFullscreen();
+    }
+  }, [mode, mp.state, started, lobbyName, characterId]);
 
   useEffect(() => {
     setPlayerName(getPlayerName());
@@ -92,6 +103,12 @@ export function PlayClient() {
 
   const character = useMemo(() => getCharacter(characterId), [characterId]);
 
+  function autoFullscreen() {
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
+    if (!isMobile || document.fullscreenElement) return;
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+
   function startGame() {
     const error = validateName(playerName);
     if (error) {
@@ -106,6 +123,7 @@ export function PlayClient() {
     setHud(initialHud(mode));
     setRunId((value) => value + 1);
     setStarted(true);
+    autoFullscreen();
   }
 
   const handleFinish = useCallback((finished: GameResult) => {
@@ -152,6 +170,7 @@ export function PlayClient() {
 
   function handleMultiStart() {
     mp.sendStart();
+    autoFullscreen();
   }
 
   if (mode === "multi" && mp.state === "waiting") {
@@ -239,6 +258,7 @@ export function PlayClient() {
             </div>
           </div>
         ) : null}
+        <LandscapeOverlay />
       </div>
       <div className="mt-5 hidden justify-center gap-6 text-sm font-bold text-muted lg:flex">
         <span>A / ← &nbsp; Kiri</span><span>D / → &nbsp; Kanan</span><span>Space &nbsp; Lompat</span><span>P &nbsp; Pause</span><span>R &nbsp; Restart</span>
